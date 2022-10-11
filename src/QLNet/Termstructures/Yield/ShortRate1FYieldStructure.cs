@@ -24,6 +24,7 @@ where AffineModel1F:OneFactorAffineModel
 
    #endregion
 
+   
    #region Methods
 
    public void updateState(double t, double r_t)
