@@ -42,12 +42,12 @@ namespace QLNet
       private BrownianBridge bb_;
 
       // constructors
-      public PathGenerator(StochasticProcess process, double length, int timeSteps, GSG generator, bool brownianBridge)
+      public PathGenerator(StochasticProcess process, double length, int timeSteps, GSG generator, bool brownianBridge, List<double> mandatoryPoints=null)
       {
          brownianBridge_ = brownianBridge;
          generator_ = generator;
          dimension_ = generator_.dimension();
-         timeGrid_ = new TimeGrid(length, timeSteps);
+         timeGrid_ = mandatoryPoints == null ? new TimeGrid(length, timeSteps) : new TimeGrid(mandatoryPoints, timeSteps);
          process_ = process as StochasticProcess1D;
          next_ = new Sample<IPath>(new Path(timeGrid_), 1.0);
          temp_ = new InitializedList<double>(dimension_);

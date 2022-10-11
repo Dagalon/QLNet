@@ -227,7 +227,11 @@ namespace QLNet
          return iborIndex_;
       }
 
-      public double fixedRate { get { return fixedRate_; } }
+      public double fixedRate
+      {
+         get { return fixedRate_; }
+         set { fixedRate_ = value; }
+      }
       public double spread { get { return spread_; } }
       public double nominal { get { return nominal_; } }
       public Type swapType { get { return type_; } }

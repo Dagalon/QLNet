@@ -2,7 +2,6 @@
 
   <PropertyGroup>
     <VersionPrefix>1.12.0</VersionPrefix>
-    <TargetFrameworks>net6.0;netstandard2.0</TargetFrameworks>
     <LangVersion>latest</LangVersion>
     <DefineConstants>$(DefineConstants);QL_NEGATIVE_RATES</DefineConstants>
     <AssemblyName>QLNet</AssemblyName>
@@ -16,6 +15,7 @@
     <PackageProjectUrl>http://github.com/amaggiulli/qlnet</PackageProjectUrl>
     <PackageTags>QLNet QuantLib quantitative finance financial</PackageTags>
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
+    <TargetFramework>net6.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
