@@ -161,9 +161,20 @@ namespace QLNet
          double discount1 = termStructure().link.discount(t);
          double discount2 = termStructure().link.discount(T);
          double forward = termStructure().link.forwardRate(t, t, Compounding.Continuous, Frequency.NoFrequency).rate();
-         double temp = sigma() * B(t, T);
-         double value = B(t, T) * forward - 0.25 * temp * temp * B(0.0, 2.0 * t);
-         return Math.Exp(value) * discount2 / discount1;
+         // double temp = sigma() * B(t, T);
+         // double value = B(t, T) * forward - 0.25 * temp * temp * B(0.0, 2.0 * t);
+         double value = -0.5 * (VarianceIntegral(0.0, T) - VarianceIntegral(0.0, t) - VarianceIntegral(t, T));
+         return Math.Exp(value + B(t,T) * forward) * discount2 / discount1;
+      }
+
+      public double VarianceIntegral(double t, double T)
+      {
+         var m = Math.Pow(sigma() / a(), 2.0);
+         var part1 = ValueB(t, T, 2.0 * a());
+         var part2 = ValueB(t, T);
+
+         return m * ((T - t) + part1 - 2.0 * part2);
+
       }
 
       private Parameter phi_;

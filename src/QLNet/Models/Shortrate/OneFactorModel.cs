@@ -181,6 +181,11 @@ namespace QLNet
          return discountBond(now, maturity, factors[0]);
       }
 
+      public double ValueB(double now, double maturity)
+      {
+         return B(now, maturity);
+      }
+
       public double discountBond(double now, double maturity, double rate)
       {
          return A(now, maturity) * Math.Exp(-B(now, maturity) * rate);

@@ -24,7 +24,7 @@ where AffineModel1F:OneFactorAffineModel
 
    #endregion
 
-   
+
    #region Methods
 
    public void updateState(double t, double r_t)
@@ -43,6 +43,6 @@ where AffineModel1F:OneFactorAffineModel
 
    protected override double discountImpl(double d)
    {
-      return d > 0? model_.discountBond(now_, d, r_t_) : model_.discount(d);
+      return d > 0? model_.discountBond(0.0, d, r_t_) : model_.discount(d);
    }
 }

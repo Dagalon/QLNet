@@ -69,6 +69,16 @@ namespace QLNet
          return new Dynamics(a(), b(), sigma(), r0_);
       }
 
+      public double ValueB(double t, double T, double gamma)
+      {
+         if (gamma * (T - t) < Math.Sqrt(Const.QL_EPSILON))
+         {
+            return T - t;
+         }
+
+         return (1.0 - Math.Exp(-gamma * (T - t)))/ gamma;
+      }
+
       protected override double A(double t, double T)
       {
          double _a = a();
