@@ -110,6 +110,8 @@ namespace QLNet
          return Utils.blackFormula(type, k, f, v);
       }
 
+
+
       /*! Futures convexity bias (i.e., the difference between
           futures implied rate and forward rate) calculated as in
           G. Kirikos, D. Novak, "Convexity Conundrums", Risk

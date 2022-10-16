@@ -181,6 +181,62 @@ namespace QLNet
          return discountBond(now, maturity, factors[0]);
       }
 
+       #region Partial derivatives
+
+      public double GetPartialDerivativeSwapRate(Date t0, Date t, double r_t, Schedule scheduleFloat, Handle<YieldTermStructure> forwardCurve,
+         Schedule scheduleFix, DayCounter dayCounterFloat, DayCounter dayCounterFix)
+      {
+
+         // Fix Leg
+         var annuity = GetAnnuity(t0, t, r_t, scheduleFix, dayCounterFix);
+
+         // Float Leg
+         var noFloatDates = scheduleFloat.Count;
+         double dLast = dayCounterFloat.yearFraction(t0, scheduleFloat.dates()[0]);
+         var derivativeFloatingLeg = 0.0;
+         var floatingLeg = 0.0;
+
+         double d0 = dayCounterFloat.yearFraction(t0, t);
+         double gLast = ValueB(d0, dLast);
+
+         for (int i = 1; i < noFloatDates; i++)
+         {
+            var deltaTime = dayCounterFloat.yearFraction(scheduleFloat.dates()[i - 1], scheduleFloat.dates()[i]);
+            var dNext = dayCounterFloat.yearFraction(t0, scheduleFloat.dates()[i]);
+            var df = discountBond(d0, dNext, r_t);
+            var libor = forwardCurve.link.forwardRate(scheduleFloat.dates()[i - 1], scheduleFloat.dates()[i],
+               dayCounterFloat, Compounding.Simple, Frequency.NoFrequency, true).rate();
+            double gNext = ValueB(d0, dNext);
+            floatingLeg += df * deltaTime * libor;
+            gLast = gNext;
+            derivativeFloatingLeg += (gNext - gLast) - deltaTime * df * libor;
+         }
+         return (derivativeFloatingLeg - annuity.Item2 * floatingLeg) / annuity.Item1;
+      }
+
+      public Tuple<double, double> GetAnnuity(Date t0,  Date t, double r_t, Schedule schedule, DayCounter dayCounter)
+      {
+         var noDates = schedule.Count;
+         var annuity = 0.0;
+         var derivativeAnnuity = 0.0;
+
+         double d0 = dayCounter.yearFraction(t0, t);
+
+         for (int i = 1; i < noDates; i++)
+         {
+            double deltaTime = dayCounter.yearFraction(schedule.dates()[i - 1], schedule.dates()[i]);
+            double di = dayCounter.yearFraction(t0, schedule.dates()[i]);
+            double df = discountBond(d0, di, r_t);
+            annuity += deltaTime * df;
+            derivativeAnnuity += -ValueB(d0, di) * deltaTime * df;
+         }
+
+         return new Tuple<double, double>(annuity, derivativeAnnuity);
+
+      }
+
+      #endregion
+
       public double ValueB(double now, double maturity)
       {
          return B(now, maturity);
