@@ -208,10 +208,10 @@ namespace QLNet
                dayCounterFloat, Compounding.Simple, Frequency.NoFrequency, true).rate();
             double gNext = ValueB(d0, dNext);
             floatingLeg += df * deltaTime * libor;
+            derivativeFloatingLeg += ((gNext - gLast) * (1.0 + deltaTime * libor)  - libor * deltaTime * gNext) * df;
             gLast = gNext;
-            derivativeFloatingLeg += (gNext - gLast) - deltaTime * df * libor;
          }
-         return (derivativeFloatingLeg - annuity.Item2 * floatingLeg) / annuity.Item1;
+         return (derivativeFloatingLeg - (annuity.Item2 / annuity.Item1)  * floatingLeg) / annuity.Item1;
       }
 
       public Tuple<double, double> GetAnnuity(Date t0,  Date t, double r_t, Schedule schedule, DayCounter dayCounter)
