@@ -183,6 +183,25 @@ namespace QLNet
 
        #region Partial derivatives
 
+       public double GetPartialDerivativeSwapRate(Date t0, Date t, double r_t, Schedule scheduleFloat,
+          Schedule scheduleFix, DayCounter dayCounterFloat, DayCounter dayCounterFix)
+       {
+          // Fix Leg
+          var annuity = GetAnnuity(t0, t, r_t, scheduleFix, dayCounterFix);
+
+          // Float Leg
+          double d0 = dayCounterFloat.yearFraction(t0, t);
+          double ta = dayCounterFloat.yearFraction(t0, scheduleFloat.startDate());
+          double tb = dayCounterFloat.yearFraction(t0, scheduleFloat.endDate());
+          var dfTa = discountBond(d0, ta, r_t);
+          var dfTb = discountBond(d0, tb, r_t);
+
+          var floatingLeg = dfTa - dfTb;
+          var derivativeFloatingLeg = dfTb * ValueB(d0, tb) - dfTa * ValueB(d0, ta);
+
+          return (derivativeFloatingLeg - (annuity.Item2 / annuity.Item1) * floatingLeg) / annuity.Item1;
+       }
+
       public double GetPartialDerivativeSwapRate(Date t0, Date t, double r_t, Schedule scheduleFloat, Handle<YieldTermStructure> forwardCurve,
          Schedule scheduleFix, DayCounter dayCounterFloat, DayCounter dayCounterFix)
       {
@@ -212,7 +231,7 @@ namespace QLNet
             gLast = gNext;
 
          }
-         return (derivativeFloatingLeg - annuity.Item2 * floatingLeg) / annuity.Item1;
+         return (derivativeFloatingLeg - (annuity.Item2 / annuity.Item1) * floatingLeg) / annuity.Item1;
       }
 
       public Tuple<double, double> GetAnnuity(Date t0,  Date t, double r_t, Schedule schedule, DayCounter dayCounter)

@@ -35,7 +35,7 @@ namespace QLNet
    {
       public HullWhite(Handle<YieldTermStructure> termStructure,
                        double a, double sigma)
-         : base(termStructure.link.forwardRate(0.0, 0.0, Compounding.Continuous, Frequency.NoFrequency).rate(),
+         : base(termStructure.link.forwardRate(0.0, 0.0, Compounding.Simple, Frequency.NoFrequency).rate(),
                 a, 0.0, sigma, 0.0)
       {
          this.termStructure_ = termStructure;
@@ -162,11 +162,14 @@ namespace QLNet
       {
          double discount1 = termStructure().link.discount(t);
          double discount2 = termStructure().link.discount(T);
-         double forward = termStructure().link.forwardRate(t, t, Compounding.Continuous, Frequency.NoFrequency).rate();
+         double forward = termStructure().link.forwardRate(t, t, Compounding.Simple, Frequency.NoFrequency).rate();
          // double temp = sigma() * B(t, T);
          // double value = B(t, T) * forward - 0.25 * temp * temp * B(0.0, 2.0 * t);
+         var BtT = B(t, T);
+         var yt = Math.Pow(sigma(), 2.0) * B(0.0, 2.0 * t);
          double value = -0.5 * (VarianceIntegral(0.0, T) - VarianceIntegral(0.0, t) - VarianceIntegral(t, T));
-         return Math.Exp(value + B(t,T) * forward) * discount2 / discount1;
+         double valueAux = -0.5 * BtT * BtT * yt;
+         return Math.Exp(valueAux + B(t,T) * forward) * discount2 / discount1;
       }
 
       public double VarianceIntegral(double t, double T)
