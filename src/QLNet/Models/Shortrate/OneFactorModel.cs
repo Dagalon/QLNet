@@ -193,15 +193,15 @@ namespace QLNet
           double d0 = dayCounterFloat.yearFraction(t0, t);
           double ta = dayCounterFloat.yearFraction(t0, scheduleFloat.startDate());
           double tb = dayCounterFloat.yearFraction(t0, scheduleFloat.endDate());
-          // var dfTa = discountBond(d0, ta, r_t);
-          // var dfTb = discountBond(d0, tb, r_t);
+          var dfTa = discountBond(d0, ta, r_t);
+          var dfTb = discountBond(d0, tb, r_t);
 
-          var dfTa = discountBond(0.0, ta, r_t);
-          var dfTb = discountBond(0.0, tb, r_t);
+          // var dfTa = discountBond(0.0, ta, r_t);
+          // var dfTb = discountBond(0.0, tb, r_t);
 
           var floatingLeg = dfTa - dfTb;
-          // var derivativeFloatingLeg = dfTb * ValueB(d0, tb) - dfTa * ValueB(d0, ta);
-          var derivativeFloatingLeg = dfTb * ValueB(0.0, tb) - dfTa * ValueB(0.0, ta);
+          var derivativeFloatingLeg = dfTb * ValueB(d0, tb) - dfTa * ValueB(d0, ta);
+          // var derivativeFloatingLeg = dfTb * ValueB(0.0, tb) - dfTa * ValueB(0.0, ta);
 
           return (derivativeFloatingLeg - (annuity.Item2 / annuity.Item1) * floatingLeg) / annuity.Item1;
        }
@@ -220,19 +220,16 @@ namespace QLNet
          var floatingLeg = 0.0;
 
          double d0 = dayCounterFloat.yearFraction(t0, t);
-         // double gLast = ValueB(d0, dLast);
-         double gLast = ValueB(0.0, dLast);
+         double gLast = ValueB(d0, dLast);
 
          for (int i = 1; i < noFloatDates; i++)
          {
             var deltaTime = dayCounterFloat.yearFraction(scheduleFloat.dates()[i - 1], scheduleFloat.dates()[i]);
             var dNext = dayCounterFloat.yearFraction(t0, scheduleFloat.dates()[i]);
-            // var df = discountBond(d0, dNext, r_t);
-            var df = discountBond(0.0, dNext, r_t);
+            var df = discountBond(d0, dNext, r_t);
             var libor = forwardCurve.link.forwardRate(scheduleFloat.dates()[i - 1], scheduleFloat.dates()[i],
                dayCounterFloat, Compounding.Simple, Frequency.NoFrequency, true).rate();
-            // double gNext = ValueB(d0, dNext);
-            double gNext = ValueB(0.0, dNext);
+            double gNext = ValueB(d0, dNext);
             floatingLeg += df * deltaTime * libor;
             derivativeFloatingLeg += ((gNext - gLast) - deltaTime * libor * gLast) * df;
             gLast = gNext;
@@ -253,11 +250,11 @@ namespace QLNet
          {
             double deltaTime = dayCounter.yearFraction(schedule.dates()[i - 1], schedule.dates()[i]);
             double di = dayCounter.yearFraction(t0, schedule.dates()[i]);
-            // double df = discountBond(d0, di, r_t);
-            double df = discountBond(0.0, di, r_t);
+            double df = discountBond(d0, di, r_t);
+            // double df = discountBond(0.0, di, r_t);
             annuity += deltaTime * df;
-            // derivativeAnnuity += -ValueB(d0, di) * deltaTime * df;
-            derivativeAnnuity += -ValueB(0.0, di) * deltaTime * df;
+            derivativeAnnuity += -ValueB(d0, di) * deltaTime * df;
+            // derivativeAnnuity += -ValueB(0.0, di) * deltaTime * df;
          }
 
          return new Tuple<double, double>(annuity, derivativeAnnuity);
