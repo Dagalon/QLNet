@@ -162,7 +162,7 @@ namespace QLNet
       {
          double discount1 = termStructure().link.discount(t);
          double discount2 = termStructure().link.discount(T);
-         double forward = termStructure().link.forwardRate(t, t, Compounding.Simple, Frequency.NoFrequency).rate();
+         double forward = termStructure().link.forwardRate(t, t, Compounding.Continuous, Frequency.NoFrequency, true).rate();
          // double temp = sigma() * B(t, T);
          // double value = B(t, T) * forward - 0.25 * temp * temp * B(0.0, 2.0 * t);
          var BtT = B(t, T);

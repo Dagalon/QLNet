@@ -184,10 +184,10 @@ namespace QLNet
        #region Partial derivatives
 
        public double GetPartialDerivativeSwapRate(Date t0, Date t, double r_t, Schedule scheduleFloat,
-          Schedule scheduleFix, DayCounter dayCounterFloat, DayCounter dayCounterFix)
+          Schedule scheduleFix, DayCounter dayCounterCurve, DayCounter dayCounterFloat, DayCounter dayCounterFix)
        {
           // Fix Leg
-          var annuity = GetAnnuity(t0, t, r_t, scheduleFix, dayCounterFix);
+          var annuity = GetAnnuity(t0, t, r_t, scheduleFix, dayCounterCurve, dayCounterFix);
 
           // Float Leg
           double d0 = dayCounterFloat.yearFraction(t0, t);
@@ -207,11 +207,11 @@ namespace QLNet
        }
 
       public double GetPartialDerivativeSwapRate(Date t0, Date t, double r_t, Schedule scheduleFloat, Handle<YieldTermStructure> forwardCurve,
-         Schedule scheduleFix, DayCounter dayCounterFloat, DayCounter dayCounterFix)
+         Schedule scheduleFix, DayCounter dayCounterCurve, DayCounter dayCounterFloat, DayCounter dayCounterFix)
       {
 
          // Fix Leg
-         var annuity = GetAnnuity(t0, t, r_t, scheduleFix, dayCounterFix);
+         var annuity = GetAnnuity(t0, t, r_t, scheduleFix, dayCounterCurve, dayCounterFix);
 
          // Float Leg
          var noFloatDates = scheduleFloat.Count;
@@ -238,18 +238,18 @@ namespace QLNet
          return (derivativeFloatingLeg - (annuity.Item2 / annuity.Item1) * floatingLeg) / annuity.Item1;
       }
 
-      public Tuple<double, double> GetAnnuity(Date t0,  Date t, double r_t, Schedule schedule, DayCounter dayCounter)
+      public Tuple<double, double> GetAnnuity(Date t0,  Date t, double r_t, Schedule schedule, DayCounter dcCurve, DayCounter dcSwap)
       {
          var noDates = schedule.Count;
          var annuity = 0.0;
          var derivativeAnnuity = 0.0;
 
-         double d0 = dayCounter.yearFraction(t0, t);
+         double d0 = dcCurve.yearFraction(t0, t);
 
          for (int i = 1; i < noDates; i++)
          {
-            double deltaTime = dayCounter.yearFraction(schedule.dates()[i - 1], schedule.dates()[i]);
-            double di = dayCounter.yearFraction(t0, schedule.dates()[i]);
+            double deltaTime = dcSwap.yearFraction(schedule.dates()[i - 1], schedule.dates()[i]);
+            double di = dcCurve.yearFraction(t0, schedule.dates()[i]);
             double df = discountBond(d0, di, r_t);
             // double df = discountBond(0.0, di, r_t);
             annuity += deltaTime * df;
