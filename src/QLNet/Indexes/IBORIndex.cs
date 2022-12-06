@@ -86,7 +86,8 @@ namespace QLNet
          Utils.QL_REQUIRE(!termStructure_.empty(), () => "null term structure set to this instance of " + name());
          double disc1 = termStructure_.link.discount(d1);
          double disc2 = termStructure_.link.discount(d2);
-         return (disc1 / disc2 - 1.0) / t;
+         // return (disc1 / disc2 - 1.0) / t;
+         return -Math.Log(disc2 / disc1) / t;
       }
 
 

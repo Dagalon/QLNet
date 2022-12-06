@@ -248,13 +248,15 @@ namespace QLNet
 
          for (int i = 1; i < noDates; i++)
          {
-            double deltaTime = dcSwap.yearFraction(schedule.dates()[i - 1], schedule.dates()[i]);
-            double di = dcCurve.yearFraction(t0, schedule.dates()[i]);
-            double df = discountBond(d0, di, r_t);
-            // double df = discountBond(0.0, di, r_t);
-            annuity += deltaTime * df;
-            derivativeAnnuity += -ValueB(d0, di) * deltaTime * df;
-            // derivativeAnnuity += -ValueB(0.0, di) * deltaTime * df;
+            var ti = schedule.dates()[i-1];
+            if (ti >= t)
+            {
+               double deltaTime = dcSwap.yearFraction(schedule.dates()[i - 1], schedule.dates()[i]);
+               double di = dcCurve.yearFraction(t0, schedule.dates()[i]);
+               double df = discountBond(d0, di, r_t);
+               annuity += deltaTime * df;
+               derivativeAnnuity += -ValueB(d0, di) * deltaTime * df;
+            }
          }
 
          return new Tuple<double, double>(annuity, derivativeAnnuity);
