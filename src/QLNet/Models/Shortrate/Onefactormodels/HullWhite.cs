@@ -166,7 +166,7 @@ namespace QLNet
          // double temp = sigma() * B(t, T);
          // double value = B(t, T) * forward - 0.25 * temp * temp * B(0.0, 2.0 * t);
          var BtT = B(t, T);
-         var yt = sigma() * sigma() * B(0.0, 2.0 * t);
+         var yt = sigma() * sigma() * ValueB(0.0, t, 2.0 * a());
          // double value_1 = -0.5 * (VarianceIntegral(0.0, T) - VarianceIntegral(0.0, t) - VarianceIntegral(t, T));
          double value = -0.5 * BtT * BtT * yt;
          return Math.Exp(value + B(t,T) * forward) * discount2 / discount1;

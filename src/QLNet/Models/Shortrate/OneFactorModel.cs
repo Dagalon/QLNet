@@ -238,11 +238,12 @@ namespace QLNet
          return (derivativeFloatingLeg - (annuity.Item2 / annuity.Item1) * floatingLeg) / annuity.Item1;
       }
 
-      public Tuple<double, double> GetAnnuity(Date t0,  Date t, double r_t, Schedule schedule, DayCounter dcCurve, DayCounter dcSwap)
+      public Tuple<double, double, double> GetAnnuity(Date t0,  Date t, double r_t, Schedule schedule, DayCounter dcCurve, DayCounter dcSwap)
       {
          var noDates = schedule.Count;
          var annuity = 0.0;
          var derivativeAnnuity = 0.0;
+         var secondDerivativeAnnuity = 0.0;
 
          double d0 = dcCurve.yearFraction(t0, t);
 
@@ -254,12 +255,14 @@ namespace QLNet
                double deltaTime = dcSwap.yearFraction(schedule.dates()[i - 1], schedule.dates()[i]);
                double di = dcCurve.yearFraction(t0, schedule.dates()[i]);
                double df = discountBond(d0, di, r_t);
+               double bTb = ValueB(d0, di);
                annuity += deltaTime * df;
-               derivativeAnnuity += -ValueB(d0, di) * deltaTime * df;
+               derivativeAnnuity += - bTb  * deltaTime * df;
+               secondDerivativeAnnuity += bTb * bTb * deltaTime * df;
             }
          }
 
-         return new Tuple<double, double>(annuity, derivativeAnnuity);
+         return new Tuple<double, double, double>(annuity, derivativeAnnuity, secondDerivativeAnnuity);
 
       }
 
